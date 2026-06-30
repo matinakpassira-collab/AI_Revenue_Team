@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Revenue Team - AI Project Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F8F9FA; color: #111827; font-size: 15px; }
+
+    /* ── Clover Health Design Tokens ── */
+    :root {
+      --clover-green:        #005129;
+      --clover-green-hover:  #17653c;
+      --clover-purple:       #5740a1;
+      --clover-purple-hover: #6b52b8;
+      --sidebar-bg:          #0b121a;
+      --sidebar-hover:       #141b24;
+      --sidebar-border:      rgba(255,255,255,0.08);
+      --sidebar-text:        rgba(255,255,255,0.70);
+      --sidebar-muted:       rgba(255,255,255,0.40);
+      --content-bg:          #F8F9FA;
+      --card-bg:             #ffffff;
+      --border:              #e5e7eb;
+      --text-primary:        #111827;
+      --text-secondary:      #6b7280;
+      --text-muted:          #9ca3af;
+    }
+
+    /* ── Layout ── */
+    .layout { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── Top Header Bar ── */
+    .header {
+      background: var(--clover-green);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      height: 48px;
+      flex-shrink: 0;
+    }
+    .header-right { opacity: 0.80; }
+
+    /* ── Main Container ── */
+    .main-container { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 232px;
+      background: var(--sidebar-bg);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+    .sidebar-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .sidebar-subtitle { font-size: 13px; color: rgba(255,255,255,0.50); }
+
+    /* Nav */
+    .nav-section { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-group { padding: 0 12px; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--sidebar-text);
+      transition: background 0.12s, color 0.12s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: white; }
+    .nav-item.active { background: var(--clover-green); color: white; font-weight: 600; }
+
+    .nav-icon {
+      width: 17px;
+      height: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-divider { margin: 12px 20px; border-top: 1px solid var(--sidebar-border); }
+
+    .nav-section-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 12px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--sidebar-muted);
+    }
+    .nav-section-label svg {
+      width: 11px; height: 11px;
+      stroke: currentColor; stroke-width: 2; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid var(--sidebar-border);
+    }
+    .sidebar-footer label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.60);
+      cursor: pointer;
+    }
+    .sidebar-footer input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; }
+    .sidebar-footer-hint { font-size: 11px; color: rgba(255,255,255,0.30); margin-top: 3px; }
+
+    /* ── Main Content ── */
+    .main-content {
+      flex: 1;
+      background: var(--content-bg);
+      overflow-y: auto;
+      padding: 28px 44px;
+    }
+
+    /* ── Tab Visibility ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Page Header ── */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    .page-header-left { flex: 1; }
+
+    .page-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--clover-green);
+      margin-bottom: 6px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .page-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 500px;
+    }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 9px 18px;
+      transition: opacity 0.12s, background 0.12s;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--clover-purple); color: white; }
+    .btn-primary:hover { opacity: 0.90; }
+    .btn-outline { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f9fafb; }
+
+    /* ── Contact Card ── */
+    .contact-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      width: 268px;
+      flex-shrink: 0;
+    }
+    .contact-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .contact-row { margin-bottom: 10px; }
+    .contact-row.secondary { margin-bottom: 8px; }
+    .contact-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .contact-value { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+    .contact-value.secondary { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
+    .contact-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+    /* ── Metrics Grid ── */
+    .metrics-grid {
+      display: flex;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .metric-card {
+      flex: 1;
+      padding: 20px 18px 18px;
+      text-align: center;
+      position: relative;
+      border-right: 1px solid var(--border);
+    }
+    .metric-card:last-child { border-right: none; }
+    .metric-card.hero-green::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; background: var(--clover-green);
+    }
+    .metric-card.hero-purple::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; background: var(--clover-purple);
+    }
+    .metric-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .metric-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+    .metric-value.green { color: var(--clover-green); }
+    .metric-value.purple { color: var(--clover-purple); }
+    .metric-label { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
+    .metric-note { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 3px; }
+
+    /* ── Section Header ── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+    .section-link {
+      font-size: 13px;
+      color: var(--clover-green);
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .section-link:hover { text-decoration: underline; }
+
+    /* ── Active Projects Strip ── */
+    .projects-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 32px;
+    }
+    .projects-strip::-webkit-scrollbar { height: 4px; }
+    .projects-strip::-webkit-scrollbar-track { background: transparent; }
+    .projects-strip::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+    .project-card-sm {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      min-width: 210px;
+      flex-shrink: 0;
+      transition: border-color 0.12s;
+    }
+    .project-card-sm:hover { border-color: #d1d5db; }
+    .project-card-sm h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .project-card-sm .dept { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .project-card-sm .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ── Status Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 9999px;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+    .badge-live   { background: #ecfdf5; color: #065f46; }
+    .badge-live .badge-dot   { background: #10b981; }
+    .badge-dev    { background: #fffbeb; color: #92400e; }
+    .badge-dev .badge-dot    { background: #f59e0b; }
+    .badge-testing { background: #eff6ff; color: #1e40af; }
+    .badge-testing .badge-dot { background: #3b82f6; }
+
+    /* External link icon */
+    .ext-link { color: var(--clover-green); display: flex; align-items: center; text-decoration: none; }
+    .ext-link:hover { opacity: 0.75; }
+    .ext-link svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Team Strip ── */
+    .team-strip { display: flex; gap: 28px; margin-top: 4px; margin-bottom: 32px; flex-wrap: wrap; }
+    .team-member { text-align: center; }
+    .team-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      margin: 0 auto 8px;
+    }
+    .team-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .team-role { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: var(--sidebar-bg);
+      border-radius: 10px;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .cta-banner h3 { font-size: 16px; font-weight: 600; color: white; margin-bottom: 4px; }
+    .cta-banner p  { font-size: 13px; color: rgba(255,255,255,0.60); }
+
+    /* ── Projects Grid Tab ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .project-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+    }
+    .project-card { cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; }
+    .project-card:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .project-card.open { border-color: var(--clover-green); }
+    .project-card h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+    .project-card .meta { font-size: 14px; color: var(--text-secondary); margin-bottom: 5px; }
+    .project-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.55; }
+    .project-card .card-footer { display: flex; justify-content: space-between; align-items: center; }
+    .project-link { color: var(--clover-green); font-size: 14px; font-weight: 500; text-decoration: none; }
+    .project-link:hover { text-decoration: underline; }
+    /* expandable panel inside project-card */
+    .proj-expand {
+      display: none; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .project-card.open .proj-expand { display: block; }
+    .proj-expand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; margin-bottom: 12px; }
+    .proj-expand-item .pek { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 2px; }
+    .proj-expand-item .pev { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+    .proj-expand-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
+    .proj-expand-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+    .proj-expand-chip { font-size: 11px; font-family: monospace; background: #f3f4f6; color: #374151; padding: 2px 7px; border-radius: 4px; }
+    .proj-expand-footer { display: flex; justify-content: space-between; align-items: center; }
+    .proj-expand-link { font-size: 13px; color: var(--clover-green); font-weight: 500; text-decoration: none; }
+    .proj-expand-link:hover { text-decoration: underline; }
+    .proj-hint { font-size: 11px; color: var(--text-muted); }
+
+    /* ── Filter Chips ── */
+    .filter-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-chip {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .filter-chip:hover { border-color: #9ca3af; }
+    .filter-chip.active { background: var(--clover-green); color: white; border-color: var(--clover-green); }
+
+    /* ── Tools Tab ── */
+    .tools-notice {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #166534;
+      margin-bottom: 20px;
+    }
+    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .tool-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      text-align: center;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .tool-card:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .tool-icon {
+      width: 44px; height: 44px;
+      background: #f3f4f6;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      font-weight: 700; color: var(--text-secondary); font-size: 13px;
+    }
+    .tool-card h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .tool-card .tool-category { font-size: 12px; color: var(--clover-purple); font-weight: 600; margin-bottom: 6px; }
+    .tool-card .tool-status { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .tool-card .add-link { font-size: 13px; color: var(--clover-green); cursor: pointer; }
+
+    /* ── Team Tab ── */
+    .org-chart {
+      background: white; border: 1px solid var(--border); border-radius: 10px;
+      padding: 32px 40px 36px; text-align: center; margin-bottom: 24px;
+    }
+    .org-chart h3 { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 28px; color: var(--text-muted); }
+    .org-node-wrap { display: flex; flex-direction: column; align-items: center; }
+    .org-node {
+      background: white; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 22px; min-width: 180px; display: inline-block;
+    }
+    .org-node.top { border-color: var(--clover-green); }
+    .org-node-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .org-node-role { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .org-connector { width: 1.5px; height: 28px; background: var(--border); margin: 0 auto; }
+    .org-peers {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 180px);
+      gap: 60px;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .org-peers::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 90px;
+      right: 90px;
+      height: 1.5px;
+      background: var(--border);
+    }
+    .org-peer {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 28px;
+    }
+    .org-peer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 1.5px;
+      height: 28px;
+      background: var(--border);
+    }
+    .org-peer::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--border);
+    }
+    .org-row { display: flex; gap: 40px; justify-content: center; align-items: flex-start; }
+    .org-row-connector { display: flex; justify-content: center; margin: 0 auto; }
+    .org-branch-line {
+      position: relative; display: flex; justify-content: center;
+      width: 100%; margin-bottom: 0;
+    }
+    .org-branch-line::before {
+      content: ''; position: absolute; top: 0; left: 50%; right: 50%;
+      height: 1.5px; background: var(--border);
+    }
+    /* How We Work section */
+    .sprint-section {
+      background: white; border: 1px solid var(--border); border-radius: 10px;
+      padding: 28px; margin-bottom: 24px;
+    }
+    .sprint-section h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+    .sprint-section p { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+    .sprint-timeline { display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .sprint-step { padding: 16px; border-right: 1px solid var(--border); }
+    .sprint-step:last-child { border-right: none; }
+    .sprint-step:nth-child(even) { background: #fafafa; }
+    .sprint-step:last-child { background: #f0fdf4; }
+    .sprint-step-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .sprint-step:first-child .sprint-step-label,
+    .sprint-step:last-child .sprint-step-label { color: var(--clover-green); }
+    .sprint-step-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .sprint-step-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+    .sprint-callouts { display: flex; gap: 16px; }
+    .sprint-callout { flex: 1; background: #f9fafb; border-radius: 8px; padding: 14px 16px; }
+    .sprint-callout-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px; }
+    .sprint-callout p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+    .what-we-do { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 28px; }
+    .what-we-do h3 { font-size: 18px; font-weight: 700; margin-bottom: 18px; color: var(--text-primary); }
+    .purpose-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .purpose-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+    .purpose-item p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── Request Form ── */
+    .form-container {
+      background: white; border: 1px solid var(--border); border-radius: 10px;
+      padding: 0; max-width: 720px; overflow: hidden;
+    }
+    .form-header { padding: 28px 28px 0; }
+    .form-container h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+    .form-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.55; }
+    .form-warning {
+      background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px;
+      padding: 10px 14px; font-size: 13px; color: #92400e; margin-bottom: 0;
+    }
+    .form-warning strong { color: #b45309; }
+    .form-body { padding: 24px 28px; }
+    .form-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 14px; display: block;
+    }
+    .form-section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0 18px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 16px; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-group label {
+      display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; margin-bottom: 5px; color: var(--text-muted);
+    }
+    .form-group label .req { color: #dc2626; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 9px 13px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text-primary);
+      background: white;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline: 2px solid var(--clover-green); outline-offset: 1px; border-color: transparent; }
+    .form-group textarea { min-height: 88px; resize: vertical; }
+    .char-count { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 3px; }
+    .form-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 28px; border-top: 1px solid var(--border); background: #fafafa;
+    }
+    .btn-clear { background: none; border: none; font-size: 14px; color: var(--text-secondary); cursor: pointer; font-weight: 500; }
+    /* legacy form-actions fallback */
+    .form-actions { display: flex; gap: 12px; margin-top: 22px; }
+
+    /* ── Expandable project cards ── */
+    .project-card-sm {
+      cursor: pointer;
+    }
+    .project-expand {
+      display: none; margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .project-card-sm.open { border-color: var(--clover-green); }
+    .project-card-sm.open .project-expand { display: block; }
+    .expand-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .expand-key { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+    .expand-val { font-size: 12px; color: var(--text-primary); text-align: right; }
+    .expand-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+    .expand-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+    .expand-chip { font-size: 11px; font-family: monospace; background: #f3f4f6; color: #374151; padding: 2px 7px; border-radius: 4px; }
+    .expand-link { font-size: 12px; color: var(--clover-green); font-weight: 500; text-decoration: none; }
+    .expand-link:hover { text-decoration: underline; }
+
+    /* ── Expandable kanban cards ── */
+    .kanban-card { cursor: pointer; }
+    .kanban-expand {
+      display: none; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .kanban-card.open { border-color: var(--clover-purple); }
+    .kanban-card.open .kanban-expand { display: block; }
+    .kexp-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .kexp-key { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+    .kexp-val { font-size: 12px; color: var(--text-primary); text-align: right; max-width: 160px; }
+    .kexp-val.blocker { color: #dc2626; }
+    .kexp-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+    .kexp-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    .kexp-tag { font-size: 11px; background: #ede9f7; color: var(--clover-purple); padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+    .kexp-actions { display: flex; gap: 8px; }
+    .kexp-btn {
+      font-size: 12px; font-weight: 500; padding: 5px 11px;
+      border-radius: 5px; cursor: pointer; font-family: inherit;
+      border: 1px solid var(--border); background: white; color: var(--text-primary);
+      transition: background 0.12s;
+    }
+    .kexp-btn:hover { background: #f9fafb; }
+    .kexp-btn.primary { background: var(--clover-purple); color: white; border-color: transparent; }
+    .kexp-btn.primary:hover { opacity: 0.9; }
+
+    /* ── Sprint Board ── */
+    .sprint-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; }
+    .sprint-chips { display: flex; gap: 8px; }
+    .sprint-chip {
+      padding: 7px 14px; font-size: 13px; font-weight: 500;
+      background: white; border: 1px solid var(--border); border-radius: 6px; color: var(--text-secondary);
+    }
+    .kanban { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; }
+    .kanban-col { width: 264px; flex-shrink: 0; display: flex; flex-direction: column; }
+    .kanban-col-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px; padding: 0 4px;
+    }
+    .kanban-col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .kanban-col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; }
+    .kanban-col-count { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: auto; }
+
+    .kanban-card {
+      background: white; border: 1px solid var(--border); border-radius: 8px;
+      padding: 15px; margin-bottom: 10px; cursor: pointer;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .kanban-card:hover { border-color: #d1d5db; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .kanban-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+    .card-id { font-size: 11px; font-family: monospace; color: var(--text-muted); }
+    .card-priority {
+      font-size: 11px; font-weight: 500;
+      padding: 2px 7px; border-radius: 4px;
+    }
+    .priority-high   { color: #dc2626; background: #fef2f2; }
+    .priority-medium { color: #d97706; background: #fffbeb; }
+    .priority-low    { color: #6b7280; background: #f9fafb; }
+    .kanban-card h5 { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 9px; line-height: 1.45; }
+    .kanban-card-meta { display: flex; justify-content: space-between; }
+    .kanban-card-meta span { font-size: 11px; color: var(--text-muted); }
+
+    /* ── Meeting Notes ── */
+    .workflow-bar {
+      background: white; border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 22px; margin-bottom: 22px;
+    }
+    .workflow-bar h4 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #374151; margin-bottom: 12px; }
+    .workflow-steps { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .workflow-step { background: #f3f4f6; padding: 6px 12px; border-radius: 4px; font-size: 13px; color: #374151; font-weight: 500; }
+    .workflow-arrow { color: #d1d5db; font-size: 14px; }
+
+    .transcription-badge {
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 6px; padding: 10px 14px;
+    }
+    .transcription-badge p { font-size: 12px; color: #065f46; font-weight: 600; }
+    .transcription-badge span { font-size: 12px; color: #16a34a; font-weight: 400; }
+
+    .meeting-card {
+      background: white; border: 1px solid var(--border); border-radius: 10px;
+      padding: 22px; margin-bottom: 16px; transition: border-color 0.12s;
+    }
+    .meeting-card:hover { border-color: #d1d5db; }
+    .meeting-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .meeting-id { font-size: 11px; font-family: monospace; color: var(--text-muted); }
+    .meeting-ticket {
+      display: inline-block; margin-left: 8px;
+      background: rgba(87,64,161,0.10); color: var(--clover-purple);
+      font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px;
+    }
+    .meeting-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-top: 3px; }
+    .meeting-date { text-align: right; }
+    .meeting-date p { font-size: 13px; color: var(--text-secondary); }
+    .meeting-date span { font-size: 12px; color: var(--text-muted); }
+    .attendees { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+    .summary-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .summary-text { font-size: 14px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 16px; }
+    .decisions-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .decisions-actions h5 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .decisions-actions ul { list-style: none; }
+    .decisions-actions li { font-size: 13px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 7px; margin-bottom: 5px; line-height: 1.45; }
+    .bullet-green { color: #10b981; margin-top: 1px; }
+    .bullet-purple { color: var(--clover-purple); margin-top: 1px; }
+
+    /* ── Admin Tab ── */
+    .admin-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .admin-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+    .admin-card h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 7px; }
+    .admin-card p { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.55; }
+    .admin-status { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; }
+    .admin-status.active { background: #ecfdf5; color: #065f46; }
+    .admin-status.phase  { background: #eff6ff; color: #1e40af; }
+    .admin-status.configured { background: #f5f3ff; color: #5b21b6; }
+
+    .link-registry { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+    .link-registry h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .add-link-btn {
+      font-size: 14px; font-weight: 500; padding: 7px 16px;
+      border: 1px solid var(--clover-purple); color: var(--clover-purple);
+      background: white; border-radius: 6px; cursor: pointer;
+    }
+    .registry-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 14px; }
+    .registry-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--text-secondary); padding: 9px 13px; border-bottom: 1px solid var(--border); }
+    .registry-table td { padding: 11px 13px; border-bottom: 1px solid #f3f4f6; color: var(--text-primary); }
+    .registry-table tr:last-child td { border-bottom: none; }
+    .url-cell { color: var(--text-muted); font-style: italic; }
+    .registry-status { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; }
+    .registry-status.linked  { background: #ecfdf5; color: #065f46; }
+    .registry-status.missing { background: #fef2f2; color: #991b1b; }
+
+    /* ── Training Tab ── */
+    .training-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    .training-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+    .card-icon { font-size: 26px; margin-bottom: 12px; }
+    .training-card h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 7px; }
+    .training-card p { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.55; }
+    .training-card a { font-size: 14px; color: var(--clover-green); font-weight: 500; text-decoration: none; }
+    .training-card a:hover { text-decoration: underline; }
+
+    .access-table { width: 100%; border-collapse: collapse; font-size: 14px; background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
+    .access-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--text-secondary); padding: 11px 18px; border-bottom: 1px solid var(--border); background: #f9fafb; }
+    .access-table td { padding: 13px 18px; border-bottom: 1px solid #f3f4f6; color: var(--text-primary); }
+    .access-table tr:last-child td { border-bottom: none; }
+    .status-badge-required { background: #fef2f2; color: #991b1b; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; }
+    .status-badge-optional  { background: #f0f9ff; color: #0369a1; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; }
+
+    .help-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 22px; }
+    .help-box h3 { font-size: 16px; font-weight: 700; color: #166534; margin-bottom: 7px; }
+    .help-box p  { font-size: 14px; color: #166534; margin-bottom: 16px; line-height: 1.6; }
+    .help-buttons { display: flex; gap: 10px; }
+    .help-btn { font-size: 14px; font-weight: 500; padding: 9px 18px; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    .help-btn.primary   { background: var(--clover-green); color: white; border: none; }
+    .help-btn.secondary { background: white; border: 1px solid var(--border); color: var(--text-primary); }
+
+    /* ── Request Success ── */
+    #request-success {
+      display: none; background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 10px; padding: 32px; text-align: center; max-width: 720px;
+    }
+    #request-success h3 { font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 10px; }
+    #request-success p  { font-size: 15px; color: #166534; margin-bottom: 18px; }
+    .request-id { font-family: monospace; font-weight: 700; color: var(--clover-green); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+    <!-- ── Top Header Bar ── -->
+    <div class="header">
+      <span>AI Revenue Team</span>
+      <span class="header-right">Internal AI Portal</span>
+    </div>
+
+    <div class="main-container">
+
+      <!-- ── Sidebar ── -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">AI Revenue Team</div>
+          <div class="sidebar-subtitle">AI Project Portal</div>
+        </div>
+
+        <nav class="nav-section">
+          <div class="nav-group">
+            <div class="nav-item active" onclick="showTab('overview')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              </div>
+              <span>Overview</span>
+            </div>
+            <div class="nav-item" onclick="showTab('projects')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M2 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M7 14h2"/><path d="M11 14h2"/><path d="M15 14h2"/></svg>
+              </div>
+              <span>Projects</span>
+            </div>
+            <div class="nav-item" onclick="showTab('tools')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+              <span>Tools</span>
+            </div>
+            <div class="nav-item" onclick="showTab('team')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span>Team</span>
+            </div>
+            <div class="nav-item" onclick="showTab('requests')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <span>Requests</span>
+            </div>
+          </div>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-label">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Internal
+          </div>
+
+          <div class="nav-group">
+            <div class="nav-item internal-tab" onclick="showTab('sprint')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M6 3H3v18h3"/><path d="M10 3H7v12h3"/><path d="M14 3h3v8h-3"/><path d="M18 3h3v14h-3"/></svg>
+              </div>
+              <span>Sprint Board</span>
+            </div>
+            <div class="nav-item internal-tab" onclick="showTab('notes')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"/><polyline points="15 3 15 9 21 9"/></svg>
+              </div>
+              <span>Meeting Notes</span>
+            </div>
+            <div class="nav-item internal-tab" onclick="showTab('admin')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </div>
+              <span>Admin</span>
+            </div>
+            <div class="nav-item internal-tab" onclick="showTab('training')">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <span>Training</span>
+            </div>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <label>
+            <input type="checkbox" id="toggleInternal" checked onchange="toggleInternalTabs()">
+            Show internal tabs
+          </label>
+          <div class="sidebar-footer-hint">(Demo toggle only)</div>
+        </div>
+      </aside>
+
+      <!-- ── Main Content ── -->
+      <main class="main-content">
+
+        <!-- ════════════════════════════════════════
+             OVERVIEW TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content active" id="tab-overview">
+
+          <div class="page-header">
+            <div class="page-header-left">
+              <div class="page-label">AI Revenue Team</div>
+              <h1 class="page-title">AI Project Portal</h1>
+              <p class="page-desc">We partner with actuarial, coding, data, and operations teams to turn repeatable work into secure AI-enabled workflows that improve speed, quality, transparency, and productivity.</p>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="showTab('requests')">Submit Request</button>
+                <button class="btn btn-outline" onclick="showTab('tools')">Explore Tools</button>
+              </div>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-card-title">Contact</div>
+              <div class="contact-row">
+                <div class="contact-label">Slack</div>
+                <div class="contact-value">#ai-revenue-team</div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-label">Email</div>
+                <div class="contact-value">ai-revenue@cloverhealth.com</div>
+              </div>
+              <hr class="contact-divider">
+              <div class="contact-row secondary">
+                <div class="contact-label">Office Hours</div>
+                <div class="contact-value secondary">Tue &amp; Thu, 2:00&ndash;3:00 PM ET</div>
+              </div>
+              <div class="contact-row secondary">
+                <div class="contact-label">Availability</div>
+                <div class="contact-value secondary">Mon&ndash;Fri, 8:00 AM&ndash;5:00 PM ET</div>
+              </div>
+              <div class="contact-row secondary">
+                <div class="contact-label">Project Docs</div>
+                <div class="contact-value secondary">Actuarial / AI Project Drive</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrics Strip -->
+          <div class="metrics-grid">
+            <div class="metric-card hero-green">
+              <div class="metric-eyebrow">Financial Impact</div>
+              <div class="metric-value green">$420K</div>
+              <div class="metric-label">Est. Annual Savings</div>
+              <div class="metric-note">Estimated &middot; based on per-project inputs</div>
+            </div>
+            <div class="metric-card hero-purple">
+              <div class="metric-eyebrow">Time Recovered</div>
+              <div class="metric-value purple">180 hrs</div>
+              <div class="metric-label">Monthly Hrs Automated</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-eyebrow">Portfolio</div>
+              <div class="metric-value">8</div>
+              <div class="metric-label">Projects Live</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-eyebrow">Delivery Speed</div>
+              <div class="metric-value">3.2 wks</div>
+              <div class="metric-label">Avg. Time to Deliver</div>
+            </div>
+          </div>
+
+          <!-- Active Projects Strip -->
+          <div class="section-header">
+            <div class="section-title">Active Projects</div>
+            <a class="section-link" onclick="showTab('projects')">View All
+              <svg style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+          <div class="projects-strip">
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>RADV Coding Tool</h4>
+              <div class="dept">For: Payment Integrity</div>
+              <div class="status-row">
+                <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">Auto-classifies RADV codes using LLM-assisted review, reducing manual coding time.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Chris Hunter</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">$85K / yr</span></div>
+                <div class="expand-row"><span class="expand-key">Hrs saved</span><span class="expand-val">40 hrs / mo</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-004</span><span class="expand-chip">AI-011</span></div>
+                <a href="#" class="expand-link">Open tool &#8599;</a>
+              </div>
+            </div>
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>Claims Triage Classifier</h4>
+              <div class="dept">For: Actuarial</div>
+              <div class="status-row">
+                <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">ML model routing claims by severity, cutting triage review time by 60%.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Matina Kpassira</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">$120K / yr</span></div>
+                <div class="expand-row"><span class="expand-key">Hrs saved</span><span class="expand-val">55 hrs / mo</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-005</span></div>
+                <a href="#" class="expand-link">Open tool &#8599;</a>
+              </div>
+            </div>
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>Billing Anomaly Detection</h4>
+              <div class="dept">For: Finance</div>
+              <div class="status-row">
+                <span class="badge badge-dev"><span class="badge-dot"></span>In Dev</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">Identifies overbilling patterns in claims data. Phase 1 targets automated flagging.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Chris Hunter</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">TBD at launch</span></div>
+                <div class="expand-row"><span class="expand-key">Target go-live</span><span class="expand-val">Jul 11, 2026</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-007</span></div>
+                <a href="#" class="expand-link">View progress &#8599;</a>
+              </div>
+            </div>
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>Contract NLP Extraction</h4>
+              <div class="dept">For: Legal</div>
+              <div class="status-row">
+                <span class="badge badge-testing"><span class="badge-dot"></span>Testing</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">Extracts key terms from provider contracts. In UAT with Legal validating a 50-contract batch.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Matina Kpassira</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">$65K / yr</span></div>
+                <div class="expand-row"><span class="expand-key">Target go-live</span><span class="expand-val">Jun 27, 2026</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-008</span></div>
+                <a href="#" class="expand-link">View preview &#8599;</a>
+              </div>
+            </div>
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>Data Quality Monitor</h4>
+              <div class="dept">For: Data Engineering</div>
+              <div class="status-row">
+                <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">Monitors 12 Snowflake tables for schema drift and data freshness, alerting via Slack.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Dale Cap</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">$70K / yr</span></div>
+                <div class="expand-row"><span class="expand-key">Hrs saved</span><span class="expand-val">30 hrs / mo</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-005</span></div>
+                <a href="#" class="expand-link">Open tool &#8599;</a>
+              </div>
+            </div>
+
+            <div class="project-card-sm" onclick="toggleProjectCard(this)">
+              <h4>Member Outreach Optimizer</h4>
+              <div class="dept">For: Operations</div>
+              <div class="status-row">
+                <span class="badge badge-dev"><span class="badge-dot"></span>In Dev</span>
+                <span style="font-size:11px;color:var(--text-muted);">Click for details</span>
+              </div>
+              <div class="project-expand">
+                <div class="expand-desc">Optimizes outreach timing and channel selection using historical response data.</div>
+                <div class="expand-row"><span class="expand-key">Owner</span><span class="expand-val">Matina Kpassira</span></div>
+                <div class="expand-row"><span class="expand-key">Est. savings</span><span class="expand-val">TBD at launch</span></div>
+                <div class="expand-row"><span class="expand-key">Target go-live</span><span class="expand-val">Jul 25, 2026</span></div>
+                <div class="expand-chips"><span class="expand-chip">AI-006</span></div>
+                <a href="#" class="expand-link">View progress &#8599;</a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Meet the Team -->
+          <div class="section-header">
+            <div class="section-title">Meet the Team</div>
+            <a class="section-link" onclick="showTab('team')">Org Chart
+              <svg style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+          <div class="team-strip">
+            <div class="team-member">
+              <div class="team-avatar" style="background:#e8f0e9;color:#005129;">DC</div>
+              <div class="team-name">Dale Cap</div>
+              <div class="team-role">Chief Actuary</div>
+            </div>
+            <div class="team-member">
+              <div class="team-avatar" style="background:#ede9f7;color:#5740a1;">CH</div>
+              <div class="team-name">Chris Hunter</div>
+              <div class="team-role">Manager Actuary</div>
+            </div>
+            <div class="team-member">
+              <div class="team-avatar" style="background:#e8f0e9;color:#005129;">MK</div>
+              <div class="team-name">Matina Kpassira</div>
+              <div class="team-role">Senior Actuary</div>
+            </div>
+          </div>
+
+          <!-- CTA Banner -->
+          <div class="cta-banner">
+            <div>
+              <h3>Have an AI build request?</h3>
+              <p>Tell us what you're trying to improve. We scope, build, and deliver in 2-week sprints.</p>
+            </div>
+            <button class="btn btn-primary" onclick="showTab('requests')">Submit Request</button>
+          </div>
+
+        </div><!-- /tab-overview -->
+
+
+        <!-- ════════════════════════════════════════
+             PROJECTS TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-projects">
+          <h1 class="page-title" style="margin-bottom:8px;">Projects</h1>
+          <p class="page-desc" style="margin-bottom:22px;">All AI solutions built for teams across the organization.</p>
+          <div class="filter-row" id="projects-filter">
+            <span class="filter-chip active" onclick="filterProjects(this,'all')">All</span>
+            <span class="filter-chip" onclick="filterProjects(this,'live')">Live</span>
+            <span class="filter-chip" onclick="filterProjects(this,'dev')">In Development</span>
+            <span class="filter-chip" onclick="filterProjects(this,'testing')">Testing</span>
+          </div>
+          <div class="projects-grid" id="projects-grid">
+
+            <div class="project-card" data-status="live" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-live"><span class="badge-dot"></span>Live</span></div>
+              <h3>RADV Coding Tool</h3>
+              <div class="meta">Built for: <strong>Payment Integrity</strong></div>
+              <div class="desc">Auto-classifies RADV codes with LLM-assisted review, reducing manual coding time by ~40 hrs/month.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Chris Hunter</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">$85K / yr</div></div>
+                  <div class="proj-expand-item"><div class="pek">Hrs Saved</div><div class="pev">40 hrs / mo</div></div>
+                  <div class="proj-expand-item"><div class="pek">Launched</div><div class="pev">Mar 2026</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">Model Runners</span><span class="proj-expand-chip">Payment Integrity</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">Open tool &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+            <div class="project-card" data-status="live" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-live"><span class="badge-dot"></span>Live</span></div>
+              <h3>Claims Triage Classifier</h3>
+              <div class="meta">Built for: <strong>Actuarial</strong></div>
+              <div class="desc">ML model routing claims by severity, cutting triage review time by 60%.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Matina Kpassira</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">$120K / yr</div></div>
+                  <div class="proj-expand-item"><div class="pek">Hrs Saved</div><div class="pev">55 hrs / mo</div></div>
+                  <div class="proj-expand-item"><div class="pek">Launched</div><div class="pev">Jan 2026</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">Automation</span><span class="proj-expand-chip">Actuarial</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">Open tool &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+            <div class="project-card" data-status="live" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-live"><span class="badge-dot"></span>Live</span></div>
+              <h3>Data Quality Monitor</h3>
+              <div class="meta">Built for: <strong>Data Engineering</strong></div>
+              <div class="desc">Automated anomaly detection on data pipelines, alerting on schema drift and freshness failures.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Dale Cap</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">$70K / yr</div></div>
+                  <div class="proj-expand-item"><div class="pek">Hrs Saved</div><div class="pev">30 hrs / mo</div></div>
+                  <div class="proj-expand-item"><div class="pek">Launched</div><div class="pev">Feb 2026</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">Snowflake Tools</span><span class="proj-expand-chip">Data Engineering</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">Open tool &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+            <div class="project-card" data-status="dev" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-dev"><span class="badge-dot"></span>In Dev</span></div>
+              <h3>Billing Anomaly Detection</h3>
+              <div class="meta">Built for: <strong>Finance</strong></div>
+              <div class="desc">Identifies overbilling patterns in claims data. Phase 1 targets automated flagging for Finance review.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Chris Hunter</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">TBD at launch</div></div>
+                  <div class="proj-expand-item"><div class="pek">Target Go-Live</div><div class="pev">Jul 11, 2026</div></div>
+                  <div class="proj-expand-item"><div class="pek">Blocker</div><div class="pev" style="color:#dc2626;">Awaiting data access</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">Model Runners</span><span class="proj-expand-chip">Finance</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">View progress &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+            <div class="project-card" data-status="testing" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-testing"><span class="badge-dot"></span>Testing</span></div>
+              <h3>Contract NLP Extraction</h3>
+              <div class="meta">Built for: <strong>Legal</strong></div>
+              <div class="desc">Extracts key terms from provider contracts. Currently in UAT with Legal validating a 50-contract batch.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Matina Kpassira</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">$65K / yr</div></div>
+                  <div class="proj-expand-item"><div class="pek">Target Go-Live</div><div class="pev">Jun 27, 2026</div></div>
+                  <div class="proj-expand-item"><div class="pek">UAT Status</div><div class="pev">In progress</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">NLP</span><span class="proj-expand-chip">Legal</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">View preview &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+            <div class="project-card" data-status="dev" onclick="toggleProjCard(this)">
+              <div style="float:right;margin-top:-2px;"><span class="badge badge-dev"><span class="badge-dot"></span>In Dev</span></div>
+              <h3>Member Outreach Optimizer</h3>
+              <div class="meta">Built for: <strong>Operations</strong></div>
+              <div class="desc">Optimizes outreach timing and channel selection for member engagement using historical response data.</div>
+              <div class="proj-expand">
+                <div class="proj-expand-grid">
+                  <div class="proj-expand-item"><div class="pek">Owner</div><div class="pev">Matina Kpassira</div></div>
+                  <div class="proj-expand-item"><div class="pek">Est. Savings</div><div class="pev">TBD at launch</div></div>
+                  <div class="proj-expand-item"><div class="pek">Target Go-Live</div><div class="pev">Jul 25, 2026</div></div>
+                  <div class="proj-expand-item"><div class="pek">Sprint</div><div class="pev">Sprint 5</div></div>
+                </div>
+                <div class="proj-expand-chips"><span class="proj-expand-chip">Automation</span><span class="proj-expand-chip">Operations</span></div>
+                <div class="proj-expand-footer">
+                  <a href="#" class="proj-expand-link">View progress &#8599;</a>
+                  <span class="proj-hint">Click to collapse</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Click to expand</div>
+            </div>
+
+          </div>
+        </div><!-- /tab-projects -->
+
+
+        <!-- ════════════════════════════════════════
+             TOOLS TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-tools">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h1 class="page-title">Tool Portal</h1>
+            <button class="btn btn-outline" onclick="showTab('requests')">Request AI Build</button>
+          </div>
+          <p class="page-desc" style="margin-bottom:18px;">Open tools in a new window. Close the tool window when done and return here.</p>
+          <div class="tools-notice">Current phase: tools open in a new window. Later, these can be embedded or integrated directly into this portal.</div>
+          <div class="filter-row" id="tools-filter">
+            <span class="filter-chip active" onclick="filterTools(this,'all')">All</span>
+            <span class="filter-chip" onclick="filterTools(this,'Automation')">Automation</span>
+            <span class="filter-chip" onclick="filterTools(this,'Model Runners')">Model Runners</span>
+            <span class="filter-chip" onclick="filterTools(this,'Snowflake Tools')">Snowflake Tools</span>
+            <span class="filter-chip" onclick="filterTools(this,'Coding Productivity')">Coding Productivity</span>
+            <span class="filter-chip" onclick="filterTools(this,'Reporting')">Reporting</span>
+            <span class="filter-chip" onclick="filterTools(this,'Human-in-the-loop QA')">Human-in-the-loop QA</span>
+          </div>
+          <div class="tools-grid" id="tools-grid">
+            <div class="tool-card" data-category="Automation">
+              <div class="tool-icon">DM</div>
+              <h4>data_management</h4>
+              <div class="tool-category">Automation</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Model Runners">
+              <div class="tool-icon">RV</div>
+              <h4>radv_py21</h4>
+              <div class="tool-category">Model Runners</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Snowflake Tools">
+              <div class="tool-icon">DC</div>
+              <h4>data_chat</h4>
+              <div class="tool-category">Snowflake Tools</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Reporting">
+              <div class="tool-icon">RP</div>
+              <h4>reporting</h4>
+              <div class="tool-category">Reporting</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Coding Productivity">
+              <div class="tool-icon">CT</div>
+              <h4>py21_coder_tracking</h4>
+              <div class="tool-category">Coding Productivity</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Coding Productivity">
+              <div class="tool-icon">LT</div>
+              <h4>py21_llm_tracking</h4>
+              <div class="tool-category">Coding Productivity</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Model Runners">
+              <div class="tool-icon">BR</div>
+              <h4>py21_batch_runners</h4>
+              <div class="tool-category">Model Runners</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Human-in-the-loop QA">
+              <div class="tool-icon">MM</div>
+              <h4>model_meat</h4>
+              <div class="tool-category">Human-in-the-loop QA</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+            <div class="tool-card" data-category="Human-in-the-loop QA">
+              <div class="tool-icon">DH</div>
+              <h4>model_doghunter</h4>
+              <div class="tool-category">Human-in-the-loop QA</div>
+              <div class="tool-status">Link not found in registry.</div>
+              <div class="add-link" onclick="showTab('admin')">Add link in registry</div>
+            </div>
+          </div>
+        </div><!-- /tab-tools -->
+
+
+        <!-- ════════════════════════════════════════
+             TEAM TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-team">
+          <h1 class="page-title" style="margin-bottom:8px;">Our Team</h1>
+          <p class="page-desc" style="margin-bottom:26px;">The AI Revenue Team reports directly to the Office of the CEO.</p>
+
+          <!-- Org Chart -->
+          <div class="org-chart">
+            <h3>Organization Chart</h3>
+            <div class="org-node-wrap">
+              <!-- Top: Dale Cap -->
+              <div class="org-node top">
+                <div class="org-node-name">Dale Cap</div>
+                <div class="org-node-role">Chief Actuary</div>
+              </div>
+              <!-- Connector line -->
+              <div class="org-connector"></div>
+              <!-- Direct reports -->
+              <div class="org-peers">
+                <div class="org-peer">
+                  <div class="org-node">
+                    <div class="org-node-name">Gregory Kogut</div>
+                    <div class="org-node-role">Director Actuary</div>
+                  </div>
+                  <div class="org-connector"></div>
+                  <div class="org-node">
+                    <div class="org-node-name">Ken Zhang</div>
+                    <div class="org-node-role">Actuary</div>
+                  </div>
+                </div>
+                <div class="org-peer">
+                  <div class="org-node">
+                    <div class="org-node-name">Chris Hunter</div>
+                    <div class="org-node-role">Manager Actuary</div>
+                  </div>
+                </div>
+                <div class="org-peer">
+                  <div class="org-node">
+                    <div class="org-node-name">Matina Kpassira</div>
+                    <div class="org-node-role">Senior Actuary</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- How We Work -->
+          <div class="sprint-section">
+            <h3>How We Work</h3>
+            <p>We operate in <strong>two-week sprints</strong>. Each sprint runs Monday to Friday over two weeks, with a kickoff, mid-sprint check-in, stakeholder review, and a close. Requests submitted via the portal feed into our backlog and are scoped and picked up in the next available sprint.</p>
+            <div class="sprint-timeline">
+              <div class="sprint-step">
+                <div class="sprint-step-label">Mon &middot; Week 1</div>
+                <div class="sprint-step-title">Sprint Kickoff</div>
+                <div class="sprint-step-desc">Scope tickets, assign owners, align on sprint goal</div>
+              </div>
+              <div class="sprint-step">
+                <div class="sprint-step-label">Thu &middot; Week 1</div>
+                <div class="sprint-step-title">Mid-Sprint Check-in</div>
+                <div class="sprint-step-desc">Surface blockers, adjust scope if needed</div>
+              </div>
+              <div class="sprint-step">
+                <div class="sprint-step-label">Wed &middot; Week 2</div>
+                <div class="sprint-step-title">Stakeholder Review</div>
+                <div class="sprint-step-desc">Demo progress to stakeholders, collect feedback</div>
+              </div>
+              <div class="sprint-step">
+                <div class="sprint-step-label">Fri &middot; Week 2</div>
+                <div class="sprint-step-title">Sprint Close</div>
+                <div class="sprint-step-desc">Retro, close tickets, prep backlog for next sprint</div>
+              </div>
+            </div>
+            <div class="sprint-callouts">
+              <div class="sprint-callout">
+                <div class="sprint-callout-label">Request Intake</div>
+                <p>Submit a request via the portal. The team reviews, scopes, and schedules it into the next sprint. You&rsquo;ll hear back within 2 business days.</p>
+              </div>
+              <div class="sprint-callout">
+                <div class="sprint-callout-label">Typical Sprint Scope</div>
+                <p>6&ndash;10 tickets per sprint across active projects. Urgent requests can be escalated to the current sprint with manager approval.</p>
+              </div>
+            </div>
+          </div>
+          <div class="what-we-do">
+            <h3>What We Do</h3>
+            <div class="purpose-grid">
+              <div class="purpose-item">
+                <h4>Increase Efficiency</h4>
+                <p>Reduce manual handoffs, repetitive review steps, and spreadsheet-based work through governed automation.</p>
+              </div>
+              <div class="purpose-item">
+                <h4>Improve Productivity</h4>
+                <p>Give teams faster ways to run models, inspect results, track performance, and focus on judgment-heavy work.</p>
+              </div>
+              <div class="purpose-item">
+                <h4>Build Responsibly</h4>
+                <p>Keep humans in the loop, document assumptions, manage access, and preserve auditability for sensitive workflows.</p>
+              </div>
+            </div>
+          </div>
+        </div><!-- /tab-team -->
+
+
+        <!-- ════════════════════════════════════════
+             REQUESTS TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-requests">
+          <h1 class="page-title" style="margin-bottom:8px;">Request an AI Build</h1>
+          <p class="page-desc" style="margin-bottom:26px;">Submit an intake request for automation, AI assistant, data pipeline, model runner, workflow improvement, or dashboard work.</p>
+
+          <div id="request-success">
+            <h3>Request Submitted!</h3>
+            <p>Your request ID is <span class="request-id"></span>. The team will review and follow up within 2 business days.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('request-success').style.display='none';document.getElementById('intake-form').style.display='block';">Submit Another</button>
+          </div>
+
+          <div class="form-container" id="intake-form">
+            <div class="form-header">
+              <h3>AI Build Intake</h3>
+              <p class="form-desc">Tell us what you are trying to improve. The team will review and follow up within 2 business days.</p>
+              <div class="form-warning"><strong>Data safety:</strong> Do not put PHI, MBI, or member-level details in request summaries unless the approved intake process allows it.</div>
+            </div>
+
+            <form onsubmit="submitRequestForm(event)">
+              <div class="form-body">
+                <span class="form-section-label">About You</span>
+                <div class="form-row">
+                  <div class="form-group"><label>Your name <span class="req">*</span></label><input type="text" name="submitter_name" required></div>
+                  <div class="form-group"><label>Your email <span class="req">*</span></label><input type="email" name="submitter_email" required></div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Department <span class="req">*</span></label><input type="text" name="department" required></div>
+                  <div class="form-group"><label>Manager or approver</label><input type="text" name="approver"></div>
+                </div>
+
+                <hr class="form-section-divider">
+                <span class="form-section-label">About the Request</span>
+                <div class="form-row">
+                  <div class="form-group"><label>Request type <span class="req">*</span></label>
+                    <select name="request_type" required><option>Automation</option><option>AI Assistant</option><option>Data Pipeline</option><option>Model Runner</option><option>Dashboard</option><option>Workflow Improvement</option><option>Other</option></select>
+                  </div>
+                  <div class="form-group"><label>Priority <span class="req">*</span></label>
+                    <select name="priority" required><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Data sensitivity <span class="req">*</span></label>
+                    <select name="data_sensitivity" required><option>Public / Non-sensitive</option><option>Internal Only</option><option>Confidential</option><option>PHI / Restricted</option></select>
+                  </div>
+                  <div class="form-group"><label>Desired timeline</label><input type="text" name="desired_timeline" placeholder="e.g. Next sprint, Q3"></div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group"><label>Request title <span class="req">*</span></label><input type="text" name="title" required></div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group">
+                    <label>What problem are you trying to solve? <span class="req">*</span></label>
+                    <textarea name="problem" required oninput="updateCount(this,'problem-count')"></textarea>
+                    <div class="char-count"><span id="problem-count">0</span> / 500 chars</div>
+                  </div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group">
+                    <label>Expected business impact</label>
+                    <textarea name="business_impact" oninput="updateCount(this,'impact-count')"></textarea>
+                    <div class="char-count"><span id="impact-count">0</span> / 500 chars</div>
+                  </div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group"><label>Data sources involved</label><textarea name="data_sources" style="min-height:64px;"></textarea></div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group"><label>Helpful links</label><textarea name="helpful_links" style="min-height:64px;"></textarea></div>
+                </div>
+                <div class="form-row full">
+                  <div class="form-group"><label>Additional notes</label><textarea name="notes" style="min-height:64px;"></textarea></div>
+                </div>
+              </div>
+              <div class="form-footer">
+                <div style="font-size:12px;color:#6b7280;">ai-revenue@cloverhealth.com &nbsp;&middot;&nbsp; #ai-revenue-team</div>
+                <div style="display:flex;gap:12px;align-items:center;">
+                  <button type="reset" class="btn-clear">Clear</button>
+                  <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div><!-- /tab-requests -->
+
+
+        <!-- ════════════════════════════════════════
+             SPRINT BOARD TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-sprint">
+          <div class="sprint-header">
+            <div>
+              <h1 class="page-title" style="font-size:22px;margin-bottom:5px;">Sprint Board</h1>
+              <p style="font-size:14px;color:#6b7280;">Sprint 4 - Jun 16 to Jun 27, 2026</p>
+            </div>
+            <div class="sprint-chips">
+              <span class="sprint-chip">9 tickets this sprint</span>
+              <span class="sprint-chip">5 team members</span>
+            </div>
+          </div>
+
+          <div class="kanban">
+
+            <!-- Backlog -->
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot" style="background:#9ca3af;"></span>
+                <span class="kanban-col-title">Backlog</span>
+                <span class="kanban-col-count">2</span>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-012</span><span class="card-priority priority-medium">medium</span></div>
+                <h5>Sentiment analysis for member calls</h5>
+                <div class="kanban-card-meta"><span>Operations</span><span>Unassigned</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Analyze call transcripts for member sentiment to flag at-risk members for proactive outreach.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">L</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Call center transcripts</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val blocker">Awaiting transcript access</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">NLP</span><span class="kexp-tag">Operations</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to In Sprint</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-013</span><span class="card-priority priority-low">low</span></div>
+                <h5>Auto-generate weekly KPI email</h5>
+                <div class="kanban-card-meta"><span>Executive</span><span>Unassigned</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Auto-compile key metrics from Snowflake and send a formatted weekly digest to leadership.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">M</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Snowflake &middot; Reporting tables</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val">None</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Reporting</span><span class="kexp-tag">Automation</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to In Sprint</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In Sprint -->
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot" style="background:#3b82f6;"></span>
+                <span class="kanban-col-title">In Sprint</span>
+                <span class="kanban-col-count">2</span>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-009</span><span class="card-priority priority-high">high</span></div>
+                <h5>Prior auth document classifier</h5>
+                <div class="kanban-card-meta"><span>Clinical</span><span>Chris Hunter</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Classify prior authorization documents by type and urgency to route to the correct reviewer automatically.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">L</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Due</span><span class="kexp-val">Jun 27, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Prior auth PDFs &middot; Snowflake</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val">None</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">NLP</span><span class="kexp-tag">Clinical</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to In Progress</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-010</span><span class="card-priority priority-medium">medium</span></div>
+                <h5>Snowflake query optimizer tool</h5>
+                <div class="kanban-card-meta"><span>Data Engineering</span><span>You</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">LLM-assisted tool that rewrites slow Snowflake queries and explains the optimization applied.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">M</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Due</span><span class="kexp-val">Jun 27, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Snowflake query logs</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val">None</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Snowflake Tools</span><span class="kexp-tag">Coding Productivity</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to In Progress</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In Progress -->
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot" style="background:#f59e0b;"></span>
+                <span class="kanban-col-title">In Progress</span>
+                <span class="kanban-col-count">2</span>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-007</span><span class="card-priority priority-high">high</span></div>
+                <h5>Billing anomaly detection model</h5>
+                <div class="kanban-card-meta"><span>Finance</span><span>Matina Kpassira</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">ML model flagging overbilling patterns in claims. Currently training on 6 months of Finance data.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">L</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Due</span><span class="kexp-val">Jun 25, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Claims &middot; Finance tables</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val blocker">Awaiting data access approval</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Model Runners</span><span class="kexp-tag">Finance</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to Review</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-008</span><span class="card-priority priority-medium">medium</span></div>
+                <h5>Contract NLP extraction v2</h5>
+                <div class="kanban-card-meta"><span>Legal</span><span>You</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Improved extraction pipeline for provider contract key terms. Adding clause-level confidence scores.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">M</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Due</span><span class="kexp-val">Jun 24, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Data source</span><span class="kexp-val">Legal contract PDFs</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val">None</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">NLP</span><span class="kexp-tag">Legal</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to Review</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Review -->
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot" style="background:#a855f7;"></span>
+                <span class="kanban-col-title">Review</span>
+                <span class="kanban-col-count">1</span>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-006</span><span class="card-priority priority-medium">medium</span></div>
+                <h5>Member outreach timing optimizer</h5>
+                <div class="kanban-card-meta"><span>Operations</span><span>Matina Kpassira</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Stakeholder review in progress. Operations team validating timing recommendations against last quarter&rsquo;s outreach results.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">M</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Due</span><span class="kexp-val">Jun 25, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Reviewer</span><span class="kexp-val">Operations lead</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Blocker</span><span class="kexp-val">None</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Automation</span><span class="kexp-tag">Operations</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn primary" onclick="event.stopPropagation()">Move to Done</button>
+                    <button class="kexp-btn" onclick="event.stopPropagation()">Log blocker</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Done -->
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot" style="background:#10b981;"></span>
+                <span class="kanban-col-title">Done</span>
+                <span class="kanban-col-count">2</span>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-004</span><span class="card-priority priority-high">high</span></div>
+                <h5>RADV coding tool v1.2</h5>
+                <div class="kanban-card-meta"><span>Payment Integrity</span><span>Chris Hunter</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Updated RADV classifier with improved confidence thresholds. Deployed to production Jun 18.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">S</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Completed</span><span class="kexp-val">Jun 18, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Outcome</span><span class="kexp-val">+12% accuracy vs v1.1</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Model Runners</span><span class="kexp-tag">Payment Integrity</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn" onclick="event.stopPropagation()">View details</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card" onclick="toggleKanbanCard(this)">
+                <div class="kanban-card-top"><span class="card-id">AI-005</span><span class="card-priority priority-medium">medium</span></div>
+                <h5>Data quality alert pipeline</h5>
+                <div class="kanban-card-meta"><span>Data Engineering</span><span>Matina Kpassira</span></div>
+                <div class="kanban-expand">
+                  <div class="kexp-desc">Slack alerting pipeline for schema drift and data freshness failures across 12 Snowflake tables. Live.</div>
+                  <div class="kexp-row"><span class="kexp-key">Effort</span><span class="kexp-val">M</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Completed</span><span class="kexp-val">Jun 16, 2026</span></div>
+                  <div class="kexp-row"><span class="kexp-key">Outcome</span><span class="kexp-val">0 undetected failures since launch</span></div>
+                  <div class="kexp-tags"><span class="kexp-tag">Snowflake Tools</span><span class="kexp-tag">Automation</span></div>
+                  <div class="kexp-actions">
+                    <button class="kexp-btn" onclick="event.stopPropagation()">View details</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- /tab-sprint -->
+
+
+        <!-- ════════════════════════════════════════
+             MEETING NOTES TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-notes">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;">
+            <div>
+              <h1 class="page-title" style="font-size:22px;margin-bottom:5px;">Meeting Notes</h1>
+              <p style="font-size:14px;color:#6b7280;">Auto-generated summaries from discovery and requirements meetings. Linked to project tickets.</p>
+            </div>
+            <div class="transcription-badge">
+              <p>Transcription: Active</p>
+              <span>Zoom AI Companion enabled</span>
+            </div>
+          </div>
+
+          <div class="workflow-bar">
+            <h4>How It Works</h4>
+            <div class="workflow-steps">
+              <span class="workflow-step">1. Meeting ends</span>
+              <span class="workflow-arrow">&#8594;</span>
+              <span class="workflow-step">2. Transcript processed</span>
+              <span class="workflow-arrow">&#8594;</span>
+              <span class="workflow-step">3. Notes auto-generated</span>
+              <span class="workflow-arrow">&#8594;</span>
+              <span class="workflow-step">4. Linked to ticket</span>
+            </div>
+          </div>
+
+          <div class="meeting-card">
+            <div class="meeting-header">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                  <span class="meeting-id">MTG-014</span>
+                  <span class="meeting-ticket">Ticket: AI-004</span>
+                </div>
+                <div class="meeting-title">RADV PY21 Requirements Review</div>
+              </div>
+              <div class="meeting-date"><p>Jun 18, 2026</p><span>45 min</span></div>
+            </div>
+            <div class="attendees">Attendees: You, Sarah (PI), Marcus (Actuarial)</div>
+            <div class="summary-label">Summary</div>
+            <div class="summary-text">Discussed coding accuracy thresholds. Agreed on 95% precision target before production deployment. Sarah confirmed test dataset available by Friday.</div>
+            <div class="decisions-actions">
+              <div>
+                <h5>Key Decisions</h5>
+                <ul>
+                  <li><span class="bullet-green">&#8226;</span> Set 95% precision threshold</li>
+                  <li><span class="bullet-green">&#8226;</span> Use 2024 RADV sample for validation</li>
+                  <li><span class="bullet-green">&#8226;</span> Weekly sync moving forward</li>
+                </ul>
+              </div>
+              <div>
+                <h5>Action Items</h5>
+                <ul>
+                  <li><span class="bullet-purple">&#9744;</span> You: Build validation pipeline by Jun 20</li>
+                  <li><span class="bullet-purple">&#9744;</span> Sarah: Share test dataset by Jun 20</li>
+                  <li><span class="bullet-purple">&#9744;</span> Marcus: Review model output format</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="meeting-card">
+            <div class="meeting-header">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                  <span class="meeting-id">MTG-013</span>
+                  <span class="meeting-ticket">Ticket: AI-007</span>
+                </div>
+                <div class="meeting-title">Billing Anomaly Detection Kickoff</div>
+              </div>
+              <div class="meeting-date"><p>Jun 17, 2026</p><span>30 min</span></div>
+            </div>
+            <div class="attendees">Attendees: Member 3, Finance Team Lead, Data Eng Lead</div>
+            <div class="summary-label">Summary</div>
+            <div class="summary-text">Scoped the anomaly detection project. Finance wants to catch overbilling patterns in claims data. Historical data available in Snowflake going back 3 years.</div>
+            <div class="decisions-actions">
+              <div>
+                <h5>Key Decisions</h5>
+                <ul>
+                  <li><span class="bullet-green">&#8226;</span> Focus on overbilling first, underbilling in phase 2</li>
+                  <li><span class="bullet-green">&#8226;</span> Use Snowflake claims_processed table</li>
+                  <li><span class="bullet-green">&#8226;</span> 2-week POC sprint</li>
+                </ul>
+              </div>
+              <div>
+                <h5>Action Items</h5>
+                <ul>
+                  <li><span class="bullet-purple">&#9744;</span> Member 3: Access request for claims tables</li>
+                  <li><span class="bullet-purple">&#9744;</span> Finance Lead: Define top 5 anomaly patterns</li>
+                  <li><span class="bullet-purple">&#9744;</span> Data Eng: Confirm data freshness SLA</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="meeting-card">
+            <div class="meeting-header">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                  <span class="meeting-id">MTG-012</span>
+                  <span class="meeting-ticket">Ticket: AI-008</span>
+                </div>
+                <div class="meeting-title">Contract NLP Extraction Demo</div>
+              </div>
+              <div class="meeting-date"><p>Jun 14, 2026</p><span>25 min</span></div>
+            </div>
+            <div class="attendees">Attendees: You, Legal Team, Compliance</div>
+            <div class="summary-label">Summary</div>
+            <div class="summary-text">Demoed v1 extraction on 10 sample contracts. Legal confirmed 8/10 extractions were accurate. Two edge cases with multi-party agreements need handling.</div>
+            <div class="decisions-actions">
+              <div>
+                <h5>Key Decisions</h5>
+                <ul>
+                  <li><span class="bullet-green">&#8226;</span> Proceed to testing phase</li>
+                  <li><span class="bullet-green">&#8226;</span> Add multi-party contract logic</li>
+                  <li><span class="bullet-green">&#8226;</span> Legal will validate next 50 contracts</li>
+                </ul>
+              </div>
+              <div>
+                <h5>Action Items</h5>
+                <ul>
+                  <li><span class="bullet-purple">&#9744;</span> You: Handle multi-party edge case by Jun 21</li>
+                  <li><span class="bullet-purple">&#9744;</span> Legal: Prepare 50-contract test batch</li>
+                  <li><span class="bullet-purple">&#9744;</span> Compliance: Review data handling approach</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tab-notes -->
+
+
+        <!-- ════════════════════════════════════════
+             ADMIN TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-admin">
+          <h1 class="page-title" style="margin-bottom:8px;">Admin</h1>
+          <p class="page-desc" style="margin-bottom:26px;">Manage tool links, notifications, and portal settings.</p>
+
+          <div class="admin-cards">
+            <div class="admin-card">
+              <h4>Slack Notifications</h4>
+              <p>Webhook configured for #ai-revenue-team channel.</p>
+              <span class="admin-status active">Active</span>
+            </div>
+            <div class="admin-card">
+              <h4>Data Layer</h4>
+              <p>Currently using Firestore. Migration to Snowflake planned for phase 2.</p>
+              <span class="admin-status phase">Phase 1</span>
+            </div>
+            <div class="admin-card">
+              <h4>Permissions</h4>
+              <p>Google login used for permission gating. Internal tabs restricted.</p>
+              <span class="admin-status configured">Configured</span>
+            </div>
+          </div>
+
+          <div class="link-registry">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+              <h3>Link Registry</h3>
+              <button class="add-link-btn">+ Add Link</button>
+            </div>
+            <table class="registry-table">
+              <thead>
+                <tr><th>Tool Name</th><th>Category</th><th>URL</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>data_management</td><td>Automation</td><td class="url-cell">Not set</td><td><span class="registry-status missing">Missing</span></td></tr>
+                <tr><td>radv_py21</td><td>Model Runners</td><td>https://radv-tool.internal</td><td><span class="registry-status linked">Linked</span></td></tr>
+                <tr><td>data_chat</td><td>Snowflake Tools</td><td class="url-cell">Not set</td><td><span class="registry-status missing">Missing</span></td></tr>
+                <tr><td>reporting</td><td>Reporting</td><td>https://reporting.internal</td><td><span class="registry-status linked">Linked</span></td></tr>
+                <tr><td>py21_coder_tracking</td><td>Coding Productivity</td><td class="url-cell">Not set</td><td><span class="registry-status missing">Missing</span></td></tr>
+                <tr><td>google_site</td><td>Reporting</td><td>https://sites.google.com/cloverhealth/ai-team</td><td><span class="registry-status linked">Linked</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /tab-admin -->
+
+
+        <!-- ════════════════════════════════════════
+             TRAINING TAB
+        ════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-training">
+          <h1 class="page-title" style="margin-bottom:8px;">Training &amp; Onboarding</h1>
+          <p class="page-desc" style="margin-bottom:26px;">Resources, documentation, and access setup for new team members.</p>
+
+          <h2 style="font-size:16px;font-weight:700;margin-bottom:18px;color:var(--text-primary);">Onboarding Documents</h2>
+          <div class="training-grid">
+            <div class="training-card">
+              <div class="card-icon">&#128218;</div>
+              <h3>Getting Started Guide</h3>
+              <p>Welcome to the AI Revenue Team. Overview of team structure, mission, and how we work.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+            <div class="training-card">
+              <div class="card-icon">&#128295;</div>
+              <h3>Tech Stack &amp; Tools</h3>
+              <p>Required software, access requests, and setup instructions for development environment.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+            <div class="training-card">
+              <div class="card-icon">&#128100;</div>
+              <h3>Data Access &amp; Security</h3>
+              <p>How to request Snowflake, Google Cloud, and other data platform access. Security policies.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+            <div class="training-card">
+              <div class="card-icon">&#128203;</div>
+              <h3>Development Workflow</h3>
+              <p>Git workflow, code review process, deployment procedures, and CI/CD pipeline.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+            <div class="training-card">
+              <div class="card-icon">&#128218;</div>
+              <h3>Project Documentation</h3>
+              <p>Runbooks, architecture diagrams, and technical specs for all active projects.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+            <div class="training-card">
+              <div class="card-icon">&#128172;</div>
+              <h3>Communication &amp; Collaboration</h3>
+              <p>Slack channels, meeting cadence, decision-making process, and escalation paths.</p>
+              <a href="#">Open Document &#8594;</a>
+            </div>
+          </div>
+
+          <h2 style="font-size:16px;font-weight:700;margin-bottom:18px;margin-top:32px;color:var(--text-primary);">Access &amp; Tools Setup</h2>
+          <table class="access-table">
+            <thead>
+              <tr><th>Tool / Service</th><th>Status</th><th>Link</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Google Cloud Platform</td>
+                <td><span class="status-badge-required">Required</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">GCP Console &#8594;</a></td>
+                <td>AI/ML services, compute, and data storage</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Snowflake</td>
+                <td><span class="status-badge-required">Required</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">Snowflake UI &#8594;</a></td>
+                <td>Data warehouse and SQL queries</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">GitHub</td>
+                <td><span class="status-badge-required">Required</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">GitHub Org &#8594;</a></td>
+                <td>Code repositories and version control</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Slack</td>
+                <td><span class="status-badge-required">Required</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">Workspace &#8594;</a></td>
+                <td>Team communication and notifications</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Google Workspace</td>
+                <td><span class="status-badge-required">Required</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">Gmail/Drive &#8594;</a></td>
+                <td>Email, docs, sheets, and file storage</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Jira / Linear</td>
+                <td><span class="status-badge-optional">Optional</span></td>
+                <td><a href="#" style="color:var(--clover-green);font-weight:500;">Project Mgmt &#8594;</a></td>
+                <td>Issue tracking and sprint planning</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="help-box">
+            <h3>Need Help?</h3>
+            <p>If you're a new team member and need access or have questions about onboarding, reach out to the team lead or post in #ai-revenue-team on Slack.</p>
+            <div class="help-buttons">
+              <button class="help-btn primary">Request Access</button>
+              <button class="help-btn secondary">Contact Team Lead</button>
+            </div>
+          </div>
+        </div><!-- /tab-training -->
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // CONFIG
+    const CONFIG = {
+      ALLOWED_DOMAIN: 'cloverhealth.com',
+    };
+
+    // Auth state
+    let currentUser = null;
+
+    function hasAppsScript() {
+      return typeof google !== 'undefined' && google.script && google.script.run;
+    }
+
+    function runServerFunction(functionName, ...args) {
+      return new Promise((resolve, reject) => {
+        if (!hasAppsScript()) {
+          reject(new Error('Apps Script runtime is not available.'));
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(error => {
+            const message = error && error.message ? error.message : String(error || 'Unknown Apps Script error');
+            reject(new Error(message));
+          })[functionName](...args);
+      });
+    }
+
+    async function initAppsScriptUser() {
+      if (!hasAppsScript()) {
+        console.log('Local preview mode: Apps Script runtime is not available.');
+        return;
+      }
+
+      try {
+        const profile = await runServerFunction('getCurrentUser');
+        if (!profile || !profile.email) return;
+
+        if (!profile.email.toLowerCase().endsWith('@' + CONFIG.ALLOWED_DOMAIN)) {
+          console.warn('Signed-in user is outside @' + CONFIG.ALLOWED_DOMAIN + '.');
+          return;
+        }
+
+        currentUser = {
+          name: profile.name || profile.email,
+          email: profile.email,
+          isInternal: true,
+        };
+        onUserAuthenticated();
+        prefillUserFields();
+      } catch (error) {
+        console.warn('Could not load Apps Script user profile:', error.message);
+      }
+    }
+
+    function onUserAuthenticated() {
+      if (!currentUser) return;
+      document.querySelectorAll('.internal-tab').forEach(el => el.style.display = 'flex');
+      document.getElementById('toggleInternal').checked = true;
+      const headerRight = document.querySelector('.header-right');
+      if (headerRight) {
+        headerRight.textContent = currentUser.name + ' | Internal AI Portal';
+      }
+    }
+
+    function prefillUserFields() {
+      const form = document.querySelector('#intake-form form');
+      if (!form || !currentUser) return;
+      if (form.submitter_email && !form.submitter_email.value) form.submitter_email.value = currentUser.email;
+      if (form.submitter_name && !form.submitter_name.value) form.submitter_name.value = currentUser.name;
+    }
+
+    // ── Form Submission ──
+    async function submitRequestForm(event) {
+      event.preventDefault();
+      const form    = event.target;
+      const btn     = form.querySelector('button[type="submit"]');
+      const origTxt = btn.textContent;
+      btn.textContent = 'Submitting...';
+      btn.disabled    = true;
+
+      const formData = {
+        submitter_name:   form.submitter_name?.value,
+        submitter_email:  form.submitter_email?.value || currentUser?.email,
+        department:       form.department?.value,
+        priority:         form.priority?.value,
+        request_type:     form.request_type?.value,
+        data_sensitivity: form.data_sensitivity?.value,
+        title:            form.title?.value,
+        problem:          form.problem?.value,
+        business_impact:  form.business_impact?.value,
+        data_sources:     form.data_sources?.value,
+        desired_timeline: form.desired_timeline?.value,
+        approver:         form.approver?.value,
+        helpful_links:    form.helpful_links?.value,
+        notes:            form.notes?.value,
+      };
+
+      const submitterEmail = (formData.submitter_email || '').trim().toLowerCase();
+      if (submitterEmail && !submitterEmail.endsWith('@' + CONFIG.ALLOWED_DOMAIN)) {
+        alert('Please use your @' + CONFIG.ALLOWED_DOMAIN + ' email address.');
+        btn.textContent = origTxt;
+        btn.disabled    = false;
+        return;
+      }
+
+      if (!hasAppsScript()) {
+        setTimeout(() => {
+          showSuccessMessage(form, 'DEMO-' + Math.random().toString(36).slice(2,8).toUpperCase());
+          btn.textContent = origTxt;
+          btn.disabled    = false;
+        }, 800);
+        return;
+      }
+
+      try {
+        const result = await runServerFunction('submitRequest', formData);
+        if (result?.success) {
+          showSuccessMessage(form, result.requestId || result.request_id || 'Submitted');
+        } else {
+          alert('Submission failed: ' + (result?.error || 'Unknown error'));
+        }
+      } catch (error) {
+        alert('Submission failed: ' + error.message);
+      } finally {
+        btn.textContent = origTxt;
+        btn.disabled    = false;
+      }
+    }
+
+    function showSuccessMessage(form, requestId) {
+      form.reset();
+      const msg = document.getElementById('request-success');
+      if (msg) {
+        msg.querySelector('.request-id').textContent = requestId;
+        msg.style.display = 'block';
+        document.getElementById('intake-form').style.display = 'none';
+      }
+    }
+
+    // ── Character Count Helper ──
+    function updateCount(textarea, countId) {
+      const el = document.getElementById(countId);
+      if (el) el.textContent = textarea.value.length;
+    }
+
+    // ── Expandable Project Cards (Projects tab) ──
+    function toggleProjCard(card) {
+      const isOpen = card.classList.contains('open');
+      card.classList.toggle('open', !isOpen);
+      const hint = card.querySelector(':scope > div:last-child');
+      if (hint) hint.textContent = isOpen ? 'Click to expand' : '';
+    }
+
+    // ── Expandable Project Cards (Overview strip) ──
+    function toggleProjectCard(card) {
+      card.classList.toggle('open');
+    }
+
+    // ── Expandable Kanban Cards ──
+    function toggleKanbanCard(card) {
+      const col = card.closest('.kanban-col');
+      col.querySelectorAll('.kanban-card.open').forEach(c => { if (c !== card) c.classList.remove('open'); });
+      card.classList.toggle('open');
+    }
+
+    // ── Tab Navigation ──
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const navItem = document.querySelector(`.nav-item[onclick="showTab('${tabId}')"]`);
+      if (navItem) navItem.classList.add('active');
+    }
+
+    function toggleInternalTabs() {
+      const checked = document.getElementById('toggleInternal').checked;
+      document.querySelectorAll('.internal-tab').forEach(el => {
+        el.style.display = checked ? 'flex' : 'none';
+      });
+    }
+
+    // ── Projects Tab Filter ──
+    function filterProjects(chip, filter) {
+      document.querySelectorAll('#projects-filter .filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      document.querySelectorAll('#projects-grid .project-card').forEach(card => {
+        card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
+      });
+    }
+
+    // ── Tools Tab Filter ──
+    function filterTools(chip, filter) {
+      document.querySelectorAll('#tools-filter .filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      document.querySelectorAll('#tools-grid .tool-card').forEach(card => {
+        card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+      });
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', () => {
+      initAppsScriptUser();
+    });
+  </script>
+</body>
+</html>
